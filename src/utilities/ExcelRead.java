@@ -1,6 +1,8 @@
 package utilities;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URISyntaxException;
 
 import javax.swing.JOptionPane;
@@ -107,6 +109,41 @@ public class ExcelRead {
 			e.printStackTrace();
 		}
 		return cellData.equals(null) ? "" : cellData;
+	}
+	
+	public static int getRowCount (String sheetName) {
+		
+		String cellData = null;
+		String path1 = getExcelFile(); // Calling GetExcelFile function to get excel file
+		// If path is empty
+		if (path1 == "") {
+			path = "";
+			JOptionPane.showMessageDialog(null, "Excel File is not selected!!", "Error", JOptionPane.ERROR_MESSAGE);
+		} else {
+			path = path1;
+		}
+		
+			FileInputStream excelFile = null;
+			try {
+				excelFile = new FileInputStream(path);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			XSSFWorkbook excelWBook = null;
+			try {
+				excelWBook = new XSSFWorkbook(excelFile);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			XSSFSheet excelWSheet = excelWBook.getSheet(sheetName); // Name of the Excel Sheet
+			DataFormatter formatter = new DataFormatter();
+			
+			return excelWSheet.getLastRowNum() - excelWSheet.getFirstRowNum();
+			
+		
+		
 	}
 
 }

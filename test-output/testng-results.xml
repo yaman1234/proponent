@@ -1,37 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testng-results ignored="0" total="5" passed="5" failed="0" skipped="0">
+<testng-results ignored="0" total="7" passed="7" failed="0" skipped="0">
   <reporter-output>
   </reporter-output>
-  <suite started-at="2022-05-25T16:37:05 NPT" name="Default suite" finished-at="2022-05-25T16:37:21 NPT" duration-ms="16420">
+  <suite started-at="2022-06-07T09:30:42 NPT" name="Default suite" finished-at="2022-06-07T09:32:02 NPT" duration-ms="79887">
     <groups>
     </groups>
-    <test started-at="2022-05-25T16:37:05 NPT" name="Default test" finished-at="2022-05-25T16:37:21 NPT" duration-ms="16420">
+    <test started-at="2022-06-07T09:30:42 NPT" name="Default test" finished-at="2022-06-07T09:32:02 NPT" duration-ms="79887">
       <class name="test.SampleTest">
-        <test-method is-config="true" signature="beforeTest()[pri:0, instance:test.SampleTest@452c8a40]" started-at="2022-05-25T16:37:05 NPT" name="beforeTest" finished-at="2022-05-25T16:37:10 NPT" duration-ms="5426" status="PASS">
+        <test-method is-config="true" signature="beforeTest()[pri:0, instance:test.SampleTest@3d34d211]" started-at="2022-06-07T09:30:42 NPT" name="beforeTest" finished-at="2022-06-07T09:30:52 NPT" duration-ms="9333" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- beforeTest -->
-        <test-method signature="excelReadTest()[pri:1, instance:test.SampleTest@452c8a40]" started-at="2022-05-25T16:37:10 NPT" name="excelReadTest" finished-at="2022-05-25T16:37:10 NPT" duration-ms="323" status="PASS">
-          <reporter-output>
-          </reporter-output>
-        </test-method> <!-- excelReadTest -->
-        <test-method signature="urlTest()[pri:2, instance:test.SampleTest@452c8a40]" started-at="2022-05-25T16:37:11 NPT" name="urlTest" finished-at="2022-05-25T16:37:12 NPT" duration-ms="1153" status="PASS">
+        <test-method signature="urlTest()[pri:2, instance:test.SampleTest@3d34d211]" started-at="2022-06-07T09:30:52 NPT" name="urlTest" finished-at="2022-06-07T09:30:55 NPT" duration-ms="3595" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- urlTest -->
-        <test-method signature="loginTest()[pri:3, instance:test.SampleTest@452c8a40]" started-at="2022-05-25T16:37:12 NPT" name="loginTest" finished-at="2022-05-25T16:37:19 NPT" duration-ms="7224" status="PASS">
+        <test-method signature="loginTest()[pri:3, instance:test.SampleTest@3d34d211]" started-at="2022-06-07T09:30:55 NPT" name="loginTest" finished-at="2022-06-07T09:31:00 NPT" duration-ms="4271" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- loginTest -->
-        <test-method signature="linksTest()[pri:4, instance:test.SampleTest@452c8a40]" started-at="2022-05-25T16:37:19 NPT" name="linksTest" finished-at="2022-05-25T16:37:20 NPT" duration-ms="1356" status="PASS">
+        <test-method signature="linksTest()[pri:4, instance:test.SampleTest@3d34d211]" started-at="2022-06-07T09:31:00 NPT" name="linksTest" finished-at="2022-06-07T09:31:02 NPT" duration-ms="2202" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- linksTest -->
-        <test-method signature="logout()[pri:5, instance:test.SampleTest@452c8a40]" started-at="2022-05-25T16:37:20 NPT" name="logout" finished-at="2022-05-25T16:37:20 NPT" duration-ms="107" status="PASS">
+        <test-method signature="searchCaseEmailCaseNum()[pri:5, instance:test.SampleTest@3d34d211]" started-at="2022-06-07T09:31:02 NPT" name="searchCaseEmailCaseNum" finished-at="2022-06-07T09:31:29 NPT" duration-ms="26901" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- searchCaseEmailCaseNum -->
+        <test-method signature="searchCaseEmailCustomerNum()[pri:6, instance:test.SampleTest@3d34d211]" started-at="2022-06-07T09:31:29 NPT" name="searchCaseEmailCustomerNum" finished-at="2022-06-07T09:31:53 NPT" duration-ms="24145" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- searchCaseEmailCustomerNum -->
+        <test-method signature="searchCaseEmailStatus()[pri:7, instance:test.SampleTest@3d34d211]" started-at="2022-06-07T09:31:53 NPT" name="searchCaseEmailStatus" finished-at="2022-06-07T09:32:02 NPT" duration-ms="8765" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- searchCaseEmailStatus -->
+        <test-method signature="logout()[pri:9, instance:test.SampleTest@3d34d211]" started-at="2022-06-07T09:32:02 NPT" name="logout" finished-at="2022-06-07T09:32:02 NPT" duration-ms="111" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- logout -->
-        <test-method is-config="true" signature="afterMethod()[pri:0, instance:test.SampleTest@452c8a40]" started-at="2022-05-25T16:37:20 NPT" name="afterMethod" finished-at="2022-05-25T16:37:21 NPT" duration-ms="714" status="PASS">
+        <test-method is-config="true" signature="afterMethod()[pri:0, instance:test.SampleTest@3d34d211]" started-at="2022-06-07T09:32:02 NPT" name="afterMethod" finished-at="2022-06-07T09:32:02 NPT" duration-ms="429" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- afterMethod -->

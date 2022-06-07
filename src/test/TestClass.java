@@ -21,21 +21,13 @@ import utilities.WebElementLib;
 
 public class TestClass extends UtilBase {
 
-	/*********** Test Cases for Smoke Test ********************/
-
-// 		Read Data from Excel File
-//		URL Verification
-//		 Login Verification
-//		Verify all the links and tabs are working or not
-//	 	Verify Search using the different combinations of Filters
-
-	/**********************************************************/
+	
 
 	public ExtentTest test;
 	public ExtentReports report;
 	String browser = null, baseUrl = null, username = null, password = null;
 	public PageObject pageObj;
-	public WebDriverWait wait;
+	WebDriverWait wait = new WebDriverWait(driver, 20);
 
 	@BeforeSuite
 	public void beforeMethod() {
@@ -52,6 +44,7 @@ public class TestClass extends UtilBase {
 	public void readExcel() throws InterruptedException {
 		test = report.startTest("Excel Read Test");
 		try {
+//			Read from sheet1
 			browser = ExcelRead.getData(0, 1, 0);
 			baseUrl = ExcelRead.getData(1, 1, 0);
 			username = ExcelRead.getData(2, 1, 0);
@@ -89,7 +82,6 @@ public class TestClass extends UtilBase {
 	// Login verification
 	@Test(priority = 3)
 	public void loginTest() throws InterruptedException {
-
 		test = report.startTest("Login Test");
 
 //		case 1 : Empty username Empty Password
@@ -108,7 +100,6 @@ public class TestClass extends UtilBase {
 		InputField.inputFieldClear(pageObj.password());
 
 		InputField.enterText(pageObj.password(), password);
-
 		if (pageObj.submit().isEnabled()) {
 			test.log(LogStatus.FAIL, "case 2 : Empty username valid Password; submit button should be diasbled");
 		} else {
@@ -117,11 +108,11 @@ public class TestClass extends UtilBase {
 
 //		case 3 : valid username empty password
 //		reset
-		InputField.inputFieldClear(pageObj.username());
-		InputField.inputFieldClear(pageObj.password());
+		driver.navigate().refresh();
+//		InputField.inputFieldClear(pageObj.username());
+//		InputField.inputFieldClear(pageObj.password());
 
 		InputField.enterText(pageObj.username(), username);
-
 		if (pageObj.submit().isEnabled()) {
 			test.log(LogStatus.FAIL, "case 3 : valid username empty password; submit button should be diasbled");
 		} else {
@@ -132,7 +123,6 @@ public class TestClass extends UtilBase {
 		InputField.inputFieldClear(pageObj.username());
 		InputField.inputFieldClear(pageObj.password());
 
-		Thread.sleep(2000);
 		// wrong credentials
 		InputField.enterText(pageObj.username(), password);
 		InputField.enterText(pageObj.password(), username);
@@ -148,7 +138,6 @@ public class TestClass extends UtilBase {
 			boolean result = WebElementLib.doesElementExist("xpath", "//*[@id=\"root\"]/div/div/form/strong");
 
 			if (result) {
-				System.out.println("working");
 				test.log(LogStatus.PASS, "case 4 : Invalid Credentials; Couldn't login");
 			}
 		} else {
@@ -156,6 +145,7 @@ public class TestClass extends UtilBase {
 		}
 
 //		case 5 : valid username valid password
+		Thread.sleep(2000);
 //		reset
 		InputField.inputFieldClear(pageObj.username());
 		InputField.inputFieldClear(pageObj.password());
@@ -167,21 +157,15 @@ public class TestClass extends UtilBase {
 			test.log(LogStatus.PASS, "case 5 : valid username valid password; login sucessful and screenshot");
 			pageObj.submit().click();
 
-//			Thread.sleep(4000);
-//			wait = new WebDriverWait(driver, 20);
-//			wait.until(ExpectedConditions.invisibilityOf(pageObj.loginForm()));
 			
-//			wait for page to load
-			WaitUntil.waitForLoad();
-//			jsDriver.executeScript("return document.readyState").equals("complete");
-//			capture screenshot
+			wait.until(ExpectedConditions.invisibilityOf(pageObj.loginForm()));
+			
 			capture("logged_in");
 		} else {
 			test.log(LogStatus.FAIL, "case 5 : valid username valid password; submit button should be enabled");
 		}
 
 		report.endTest(test);
-
 	}
 
 	// Links and Tabs
@@ -191,9 +175,8 @@ public class TestClass extends UtilBase {
 		try {
 //			wait for load
 			wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("ant-table-column-sorters")));
-//			verify Case Emails Tab
+//			verify Case Emails Tab cn = Case Number
 			WebElement cn = driver.findElement(By.className("ant-table-column-sorters"));
-			System.out.println(cn.getText());
 			if (cn.getText() != null) {
 				test.log(LogStatus.PASS, "Case Email Page loaded sucessfully");
 			} else {
@@ -207,9 +190,24 @@ public class TestClass extends UtilBase {
 		// click to settings Tab
 		try {
 			pageObj.settings().click();
+			Thread.sleep(2000);
+//			user management section
+//			wait for the page load ie. until the display of Add User btn
+			wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id=\"rc-tabs-2-panel-user_management\"]/div/form/div/div[3]/div/div[2]/div[2]/div[1]/div/div/div/div/button")));
+//			au = add user btn
+			WebElement au = driver.findElement(By.xpath("//*[@id=\"rc-tabs-2-panel-user_management\"]/div/form/div/div[3]/div/div[2]/div[2]/div[1]/div/div/div/div/button"));
+			if(au.getText() != null) {
+				test.log(LogStatus.PASS, "User Management page loaded sucessfully");
+			}
 			
-//			wait for page to load
-			jsDriver.executeScript("return document.readyState").equals("complete");
+			Thread.sleep(2000);
+//			Application Setting section
+			pageObj.appSettings().click();
+//			as = add setting btn
+			WebElement as = driver.findElement(By.xpath("//*[@id=\"rc-tabs-2-panel-application_settings\"]/div/form/div/div[2]/div/div[1]/div[2]/div/div/div/button"));
+			if(as.getText() != null) {
+				test.log(LogStatus.PASS, "Application Setting page loaded sucessfully");
+			}
 			
 		} catch (Exception e) {
 			System.out.println("Error in pageObj.settings().click() ");
@@ -228,5 +226,7 @@ public class TestClass extends UtilBase {
 //		driver.close();
 
 	}
+	
+
 
 }

@@ -14,17 +14,16 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class WaitUntil extends UtilBase
 {
-static	WebDriverWait wait;
-static	int t1 = 30;
-static	int t2 = 60;
+	WebDriverWait wait;
+	int t1 = 30;
+	int t2 = 60;
 	
 
 	/**
 	 * This method will return document.readyState and wait until pageLoadCondition return complete
 	 * @param driver
 	 */
-
-	public static void waitForLoad()
+	public void waitForLoad()
 	{
 		ExpectedCondition<Boolean> pageLoadCondition = new ExpectedCondition<Boolean>()
 		{
@@ -33,9 +32,8 @@ static	int t2 = 60;
 				return ((JavascriptExecutor)driver).executeScript("return document.readyState").equals("complete");
 			}
 		};
-		WebDriverWait wait = new WebDriverWait(driver, t1);
+		WebDriverWait wait = new WebDriverWait(driver, t2);
 		wait.until(pageLoadCondition);
-//		System.out.println("method is called");
 	}
 
 	/**
@@ -136,7 +134,7 @@ static	int t2 = 60;
 	 * @param attribute
 	 * @param value
 	 */
-	public static void  wait_visibilityOfElementLocated(String attribute, String value)
+	public void  wait_visibilityOfElementLocated(String attribute, String value)
 	{
 		if (attribute != null && value != null)
 		{

@@ -1,0 +1,62 @@
+
+Customer Pages
+82682   11
+32203	10
+85564	3  20/pages option is not shown
+91089	1
+13024	1
+31530	20
+80688 	5
+
+Status failed 4 pages
+2022-05-02	7 pages are shown 
+only 7 are shown
+2022-05-12 /pages option shown for 3 pages
+
+Search
+Go to every page
+Load data on arrayList
+compare at last
+
+
+Get the last Li element
+(if title = 20 / page )
+{
+	LastRow = li:nth-child(n-2)
+	
+	for (int i = 1; i <= LastRow; i++){
+	click()
+	Thread.sleep()
+	Load column data to arrayList
+	next page
+	}
+}
+else{
+LastRow = li:nth-child(n-1)
+}
+
+HappyFlow Line no 71
+//			Last page = n-1
+			WebElement lastLiElement1 = driver.findElement(By.cssSelector(
+					"#root > div > div > div > div > div > div > div > ul > li:nth-child(" + (n - 1) + ")"));
+			System.out.println(lastLiElement1.getText());
+			int count = Integer.parseInt(lastLiElement1.getText());
+			List<String> dataList = new ArrayList<String>();
+			int rowCount =0;
+			
+			for (int i = 1; i <= count; i++) {
+				rowCount = TableData.getRowCount(pageObj.table());
+
+				for (int j = 1; j < rowCount; j++) {
+					String cellData =	driver.findElement(By.xpath("//*[@id='root']/div/div/div/div/div/div/div/div/div/div[2]/table/tbody/tr["+ (j) +"]/td[3]")).getText();
+					dataList.add(cellData);
+//					System.out.println(j);
+				}
+				driver.findElement(By.cssSelector(
+						"#root > div > div > div > div > div > div > div > ul > li:nth-child(" + (i) + ")")).click();
+			}
+			
+			Iterator<String> it = dataList.iterator();
+			while(it.hasNext()) {
+				System.out.println(it.next());
+			}
