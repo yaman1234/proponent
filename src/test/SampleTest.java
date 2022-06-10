@@ -1,26 +1,21 @@
 package test;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import com.relevantcodes.extentreports.ExtentReports;
 import com.relevantcodes.extentreports.ExtentTest;
 import com.relevantcodes.extentreports.LogStatus;
 
-import okio.Timeout;
 import pageObjects.PageObject;
 import utilities.ExcelRead;
 import utilities.InputField;
@@ -37,41 +32,59 @@ public class SampleTest extends UtilBase {
 	ExtentReports report;
 	WebElement targetTable;
 
-	/*********** Test Cases for Smoke Test ********************/
+	List<String> caseNoList, customerNoList, colData;
 
-//		Read Data from Excel File
-//	URL Verification
-//	 Login Verification
-//	Verify all the links and tabs are working or not
-// 	Verify Search using the different combinations of Filters
+	int rowCountCaseNo, rowCountCustomerNo;
 
-	/**********************************************************/
+	int counter;
 
 	@BeforeClass(alwaysRun = true)
 	public void beforeTest() {
 		initialiseDriver();
+//		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		driver.manage().window().maximize();
 
 		wait = new WebDriverWait(driver, 20);
 		report = new ExtentReports(System.getProperty("user.dir") + "//testReports//ExtentReport.html");
-		excelReadTest();
-	}
 
-//	@Test(priority = 1)
-	public void excelReadTest() {
-		test = report.startTest("Excel Read Test");
 		try {
 			browser = ExcelRead.getData(0, 1, 0);
 			baseUrl = ExcelRead.getData(1, 1, 0);
 			username = ExcelRead.getData(2, 1, 0);
 			password = ExcelRead.getData(3, 1, 0);
 
-			test.log(LogStatus.PASS, "sucessfully read data from Excel File");
+		} catch (Exception e) {
+			System.out.println("Failed to read data from Excel File");
+		}
+
+//		load the case no. to array
+		try {
+			rowCountCaseNo = ExcelRead.getRowCount("caseNo");
+			caseNoList = new ArrayList<String>();
+
+			for (int i = 1; i <= rowCountCaseNo; i++) {
+				caseNoList.add(ExcelRead.getData(i, 0, "caseNo"));
+			}
 
 		} catch (Exception e) {
-			test.log(LogStatus.FAIL, "Failed to read data from Excel File");
+			System.out.println("Failed to read case no. from excel sheet");
 		}
-		report.endTest(test);
+
+//		load the customer no. to array
+		try {
+			rowCountCustomerNo = ExcelRead.getRowCount("customerNo");
+			customerNoList = new ArrayList<String>();
+
+			// LOADS THE CONTENET OF EXCEL SHEET INTO ARRAYLIST
+			for (int i = 1; i <= rowCountCustomerNo; i++) {
+				customerNoList.add(ExcelRead.getData(i, 0, "customerNo"));
+			}
+		} catch (Exception e) {
+			System.out.println("Failed to read customer no. from excel sheet");
+		}
+
+		System.out.println("sucessfully read data from Excel File and stored into ArrayList");
+
 	}
 
 	// URL verification
@@ -81,14 +94,13 @@ public class SampleTest extends UtilBase {
 
 		// check if baseURL is null
 		if (baseUrl == null) {
-			test.log(LogStatus.ERROR, "Empty URL"); 
+			test.log(LogStatus.ERROR, "Empty URL");
 			driver.quit();
-		} 
-		else {
+		} else {
 			// if URL isnot null go to the URL and get the title
 			driver.get(baseUrl);
 			String title = driver.getTitle();
-			System.out.println(title);
+			System.out.println("Title : " + title);
 //			Compare the title with the expected string
 			if (title.equals("Proponent.")) {
 				test.log(LogStatus.PASS, "URL : " + baseUrl + " Title : " + title);
@@ -140,8 +152,7 @@ public class SampleTest extends UtilBase {
 		}
 
 //		case 4 : Wrong username and Wrong Password
-		InputField.inputFieldClear(pageObj.username());
-		InputField.inputFieldClear(pageObj.password());
+		driver.navigate().refresh();
 
 		// wrong credentials
 		InputField.enterText(pageObj.username(), password);
@@ -162,9 +173,7 @@ public class SampleTest extends UtilBase {
 		}
 
 //	case 5 : valid username valid password
-//	reset
-		InputField.inputFieldClear(pageObj.username());
-		InputField.inputFieldClear(pageObj.password());
+		driver.navigate().refresh();
 
 		InputField.enterText(pageObj.username(), username);
 		InputField.enterText(pageObj.password(), password);
@@ -172,15 +181,12 @@ public class SampleTest extends UtilBase {
 		if (pageObj.submit().isEnabled()) {
 			pageObj.submit().click();
 
-//		WaitUntil.waitForLoad();
-//		jsDriver.executeScript("return document.readyState").equals("complete");
-
-			wait.until(ExpectedConditions
-					.elementToBeClickable(By.xpath("//div[@class='navbar-collapse collapse']/ul/li[1]")));
+			wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@class='navbar-collapse collapse']/ul/li[1]")));
 
 //		capture screenshot
 			capture("logged_in");
 			test.log(LogStatus.PASS, "case 5 : Logged in and screenshot captured");
+			System.out.println("Logged in");
 		} else {
 			test.log(LogStatus.FAIL, "case 5 : valid username valid password; submit button should be enabled");
 		}
@@ -189,31 +195,29 @@ public class SampleTest extends UtilBase {
 	}
 
 //	Links and Tabs test
-	@Test(priority = 4)
+//	@Test(priority = 4)
 	public void linksTest() throws InterruptedException {
 		test = report.startTest("Links and Tabs Test");
-		WebElement caseNoElem = driver.findElement(By.className("ant-table-column-sorters"));
-		if (WebElementLib.doesElementExist(caseNoElem)) {
+
+		try {
+			driver.findElement(By.className("ant-table-column-sorters"));
 			test.log(LogStatus.PASS, "Case Email Page Loaded sucessfully");
-		} else {
+		} catch (Exception e) {
 			test.log(LogStatus.FAIL, "Case Email Page didnot Load");
 		}
-
 //			click to settings
 		pageObj.settings().click();
-
-//			table head of user management
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("ant-table-thead")));
+		Thread.sleep(3000);
 
 //			User management
 		WebElement setObj = driver.findElement(By.xpath("//*[@id=\"rc-tabs-0-tab-user_management\"]"));
-		String value = setObj.getAttribute("aria-selected");
+		String value = setObj.getAttribute("aria-selected"); // search by attribute
 
 		if (value.equalsIgnoreCase("true")) {
 			// User Management tab is selected currently
 //		does Add User btn exist
-			WebElement addUserBtn = driver.findElement(By.xpath(
-					"//*[@id=\"rc-tabs-0-panel-user_management\"]/div/form/div/div[3]/div/div[2]/div[2]/div[1]/div/div/div/div/button"));
+			WebElement addUserBtn = driver
+					.findElement(By.xpath("//*[@id='rc-tabs-0-panel-user_management']/div/form/div/div[3]/div/div[2]/div[2]/div[1]/div/div/div/div/button"));
 			if (WebElementLib.doesElementExist(addUserBtn)) {
 				test.log(LogStatus.PASS, "User Management tab loaded sucessfully");
 			}
@@ -221,139 +225,146 @@ public class SampleTest extends UtilBase {
 
 //		click Application setting btn
 		pageObj.appSettings().click();
-//		table head of user management
-		wait.until(ExpectedConditions.visibilityOfElementLocated(
-				By.xpath("//*[@id=\"rc-tabs-0-panel-application_settings\"]/div/form/div/div[2]/div/div[1]")));
+		Thread.sleep(2000);
 
-		WebElement addSettingBtn = driver.findElement(
-				By.xpath("//*[@id=\"rc-tabs-0-panel-application_settings\"]/div/form/div/div[2]/div/div[1]"));
-		if (WebElementLib.doesElementExist(addSettingBtn)) {
+		try {
+			driver.findElement(By.xpath("//*[@id=\"rc-tabs-0-panel-application_settings\"]/div/form/div/div[2]/div/div[1]"));
 			test.log(LogStatus.PASS, "Application Setting tab loaded sucessfully");
+
+		} catch (Exception e) {
+			test.log(LogStatus.FAIL, "Application Setting tab didnot Load");
 		}
 
 		report.endTest(test);
 
 	}
 
-	@Test(priority = 5)
+//	@Test(priority = 5)
 	public void searchCaseEmailCaseNum() throws InterruptedException {
 		test = report.startTest("Case Email Search by CASE NO:");
-		String tableCellDataCaseNum;
+		System.out.println("Case Email Search by CASE NO:");
+		String tableCellData;
 
 		driver.navigate().to(baseUrl);
 		Thread.sleep(2000);
-		/*************************
-		 * SEARCH TEST
-		 *******************************************/
-//		search with case number take input from Excel Sheet
-
-		int rowCountCaseNo = ExcelRead.getRowCount("caseNo");
-		List<String> caseNum = new ArrayList<String>();
-
-		for (int i = 1; i <= rowCountCaseNo; i++) {
-			caseNum.add(ExcelRead.getData(i, 0, "caseNo"));
-		}
 
 		for (int i = 0; i < (rowCountCaseNo); i++) {
 			driver.navigate().refresh();
-			pageObj.caseNo().sendKeys(caseNum.get(i));
+			String currentCaseNo = caseNoList.get(i);
+			pageObj.caseNo().sendKeys(currentCaseNo);
 			pageObj.searchBtn().click();
-			Thread.sleep(4000);
-			targetTable = driver
-					.findElement(By.xpath("//*[@id=\"root\"]/div/div/div/div/div/div/div/div/div/div[2]/table"));
-			tableCellDataCaseNum = TableData.getElement(targetTable, 1, 0).getText();
 			Thread.sleep(3000);
-			if (tableCellDataCaseNum.equals(caseNum.get(i))) {
-				test.log(LogStatus.PASS, "Case Number : " + caseNum.get(i) + " Found");
 
-			} else {
-				test.log(LogStatus.PASS, "Case Number : " + caseNum.get(i) + " does not Exist");
+			try {
+				driver.findElement(By.xpath("//div[@class='ant-empty ant-empty-normal']"));
+//				above stmt searches for the NO DATA FOUND element, if element is found --> Invalid case no else, creates an Exception
+				test.log(LogStatus.PASS, "Case Number : " + currentCaseNo + " does not Exist");
+				System.out.println(currentCaseNo + " doesnot exists");
+			} catch (Exception e) {
+				targetTable = pageObj.table();
+				tableCellData = TableData.getElement(targetTable, 1, 0).getText();
+
+				if (tableCellData.equals(currentCaseNo)) {
+					test.log(LogStatus.PASS, "Case Number : " + currentCaseNo + " matched with result");
+					System.out.println(currentCaseNo + " matched with result");
+				} else {
+					test.log(LogStatus.FAIL, "Case Number : " + currentCaseNo + " didn't matched with result");
+				}
 			}
 		}
 		report.endTest(test);
 	}
 
 	@Test(priority = 6)
-	public void searchCaseEmailCustomerNum() throws InterruptedException {
-		String tableCellDataCustomerNum;
-		test = report.startTest("Search by customer no: ");
+	public void searchCaseEmailCustomerNo() throws InterruptedException {
+		test = report.startTest("Search by customer no.");
+		System.out.println("Search by customer no.");
+		System.out.println("Total data in excel sheet: " + rowCountCustomerNo);
 
-//	search with customer number take input from Excel Sheet
-//	only need data from the column B
-
-		int rowCount = ExcelRead.getRowCount("customerNo");
-		List<String> customerNum = new ArrayList<String>();
-
-		for (int i = 1; i <= rowCount; i++) {
-			customerNum.add(ExcelRead.getData(i, 0, "customerNo"));
-		}
-
-		for (int i = 0; i < (rowCount); i++) {
+		for (int i = 0; i < rowCountCustomerNo; i++) {
+			String currentCustomerNo = customerNoList.get(i);
+			System.out.println("<------ customer no: " + currentCustomerNo + " ------> ");
 			driver.navigate().refresh();
-			pageObj.customerNo().sendKeys(customerNum.get(i));
+			pageObj.customerNo().sendKeys(currentCustomerNo);
 			pageObj.searchBtn().click();
-			Thread.sleep(4000);
-			targetTable = driver
-					.findElement(By.xpath("//*[@id='root']/div/div/div/div/div/div/div/div/div/div[2]/table"));
-			tableCellDataCustomerNum = TableData.getElement(targetTable, 1, 1).getText();
 			Thread.sleep(3000);
-			if (tableCellDataCustomerNum.equals(customerNum.get(i))) {
-				test.log(LogStatus.PASS, "Customer: " + customerNum.get(i) + " Found");
 
-			} else {
-				test.log(LogStatus.FAIL, "customer: " + customerNum.get(i) + " not Found");
+			try {
+				driver.findElement(By.xpath("//div[@class='ant-empty ant-empty-normal']"));
+//				above stmt searches for the NO DATA FOUND element, if element is found --> Invalid cutomer no. else, creates an Exception
+				test.log(LogStatus.PASS, "Customer Number: " + currentCustomerNo + " does not Exist");
+				System.out.println("Customer Number:"+currentCustomerNo + " doesnot exists");
+			} catch (Exception e) {
+//				scroll
+				WebElement element = pageObj.pagination();
+				jsDriver.executeScript("arguments[0].scrollIntoView();", element);
+				Thread.sleep(1000);
+//			findElments returns List getTotalLiPagination gives total no of li elements
+				List<WebElement> pageList = driver.findElements(By.xpath("//*[@id='root']/div/div/div/div/div/div/div/ul/li"));
+				int totalLi = pageList.size();
+//				get the last li Element
+				WebElement lastLiElement = driver
+						.findElement(By.cssSelector("#root > div > div > div > div > div > div > div > ul > li:nth-child(" + (totalLi) + ")"));
+
+				String liTitle = lastLiElement.getAttribute("title");
+				colData = new ArrayList<String>();
+//				20/pages is not recognized by lastLiElement.getAttribute("title"). so used if method 
+				if (liTitle.equals("Next Page")) {
+					WebElement lastPage = driver
+							.findElement(By.cssSelector("#root > div > div > div > div > div > div > div > ul > li:nth-child(" + (totalLi - 1) + ")"));
+					int count = Integer.parseInt(lastPage.getText());
+					System.out.println("Total no of pages:" + count);
+
+					for (counter = 1; counter <= count; counter++) {
+						storeColumn();
+						driver.findElement(By.xpath("//li[@title='Next Page']")).click();
+						Thread.sleep(4000);
+					}
+
+				} else {
+//					Last page = n-2
+					WebElement lastLiElement2 = driver
+							.findElement(By.cssSelector("#root > div > div > div > div > div > div > div > ul > li:nth-child(" + (totalLi - 2) + ")"));
+
+					int count = Integer.parseInt(lastLiElement2.getText());
+					System.out.println("Total no of pages: " + count);
+
+					for (counter = 1; counter <= count; counter++) {
+						storeColumn();
+						driver.findElement(By.xpath("//li[@title='Next Page']")).click();
+						Thread.sleep(4000);
+					}
+
+				}
+				test.log(LogStatus.PASS, "customer no: "+currentCustomerNo+" Total rows of data: " +colData.size());
+				System.out.println("Total rows of data: " + colData.size());
+				
+				/****** comparing code goes here *******************/
+				for (int x = 0; x < colData.size(); x++) {
+					if (colData.get(0) != colData.get(x)) {
+						System.out.println("ERROR" +x +"  " + colData.get(x));
+					}
+				}
+				
+			
 			}
 		}
 
 		report.endTest(test);
-
 	}
 
-	@Test(priority = 7)
-	public void searchCaseEmailStatus() throws InterruptedException {
+	public void storeColumn() throws InterruptedException {
+//		get table
+		WebElement targetTable = pageObj.table();
+//		get row count
+		int rc = TableData.getRowCount(targetTable);
+		System.out.println("page: " + counter + " data rows: " + (rc - 1));
+		String cellData = null;
 
-		test = report.startTest("Search by Status: ");
-
-/*********************** SEARCH BY STATUS *******************************************/
-//	clear the case No. Field and choose value from status dropdown
-
-//	Dropdown value selected New Message
-		driver.navigate().refresh();
-		WebElement elemNewMsz = driver.findElement(By.cssSelector("#status"));
-		elemNewMsz.sendKeys(Keys.ENTER);
-		Thread.sleep(1000);
-		elemNewMsz.sendKeys(Keys.ARROW_DOWN);
-		Thread.sleep(1000);
-		elemNewMsz.sendKeys(Keys.ENTER);
-		pageObj.searchBtn().click();
-
-		Thread.sleep(2000);
-//		get row count NOTE: only counting the rows from single page
-//		System.out.println("STATUS : NEW MESSAGE Total no of rows : " + TableData.getRowCount(pageObj.table()));
-		int rowCountNew = TableData.getRowCount(pageObj.table());
-		if (rowCountNew > 1) {
-			test.log(LogStatus.PASS, "Found N data with status NEW");
+		for (int i = 2; i <= rc; i++) {
+			cellData = driver.findElement(By.xpath("//*[@id='root']/div/div/div/div/div/div/div/div/div/div[2]/table/tbody/tr[" + (i) + "]/td[3]")).getText();
+			colData.add(cellData);
 		}
-
-//	Dropdown value selected Completed
-		driver.navigate().refresh();
-		WebElement elemCompleted = driver.findElement(By.cssSelector("#status"));
-		elemCompleted.sendKeys(Keys.ENTER);
-		Thread.sleep(1000);
-		elemCompleted.sendKeys(Keys.ARROW_DOWN, Keys.ARROW_DOWN, Keys.ARROW_DOWN, Keys.ARROW_DOWN, Keys.ARROW_DOWN);
-		elemCompleted.sendKeys(Keys.ENTER);
-
-		pageObj.searchBtn().click();
-
-		Thread.sleep(2000);
-//		get row count NOTE: only counting the rows from single page
-		int rowCountCompleted = TableData.getRowCount(pageObj.table());
-		if (rowCountCompleted > 1) {
-			test.log(LogStatus.PASS, "Found N data with status COMPLETED");
-		}
-
-		report.endTest(test);
-
 	}
 
 	@Test(priority = 9)
