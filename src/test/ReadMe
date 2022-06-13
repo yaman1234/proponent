@@ -17,3 +17,8 @@ counter issue solved
 comparing the values from list not successful
 use of try-catch block to find the no data found exception
 
+june 13
+comparing the values from list successful
+parameterized the storeCol method
+next task: work on the status column 
+click the Re-Process btn if the status is other than completed get the case no.

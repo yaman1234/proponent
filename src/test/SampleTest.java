@@ -1,6 +1,7 @@
 package test;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -48,7 +49,7 @@ public class SampleTest extends UtilBase {
 		report = new ExtentReports(System.getProperty("user.dir") + "//testReports//ExtentReport.html");
 
 		try {
-			browser = ExcelRead.getData(0, 1, 0);
+			browser = ExcelRead.getData(0, 1, 0).trim();
 			baseUrl = ExcelRead.getData(1, 1, 0);
 			username = ExcelRead.getData(2, 1, 0);
 			password = ExcelRead.getData(3, 1, 0);
@@ -195,7 +196,7 @@ public class SampleTest extends UtilBase {
 	}
 
 //	Links and Tabs test
-//	@Test(priority = 4)
+	@Test(priority = 4)
 	public void linksTest() throws InterruptedException {
 		test = report.startTest("Links and Tabs Test");
 
@@ -239,7 +240,7 @@ public class SampleTest extends UtilBase {
 
 	}
 
-//	@Test(priority = 5)
+	@Test(priority = 5)
 	public void searchCaseEmailCaseNum() throws InterruptedException {
 		test = report.startTest("Case Email Search by CASE NO:");
 		System.out.println("Case Email Search by CASE NO:");
@@ -254,7 +255,7 @@ public class SampleTest extends UtilBase {
 			pageObj.caseNo().sendKeys(currentCaseNo);
 			pageObj.searchBtn().click();
 			Thread.sleep(3000);
-
+System.out.println("<------- "+"case no: "+currentCaseNo+" -------->");
 			try {
 				driver.findElement(By.xpath("//div[@class='ant-empty ant-empty-normal']"));
 //				above stmt searches for the NO DATA FOUND element, if element is found --> Invalid case no else, creates an Exception
@@ -265,10 +266,10 @@ public class SampleTest extends UtilBase {
 				tableCellData = TableData.getElement(targetTable, 1, 0).getText();
 
 				if (tableCellData.equals(currentCaseNo)) {
-					test.log(LogStatus.PASS, "Case Number : " + currentCaseNo + " matched with result");
+					test.log(LogStatus.PASS, "Case Number: " + currentCaseNo + " matched with result");
 					System.out.println(currentCaseNo + " matched with result");
 				} else {
-					test.log(LogStatus.FAIL, "Case Number : " + currentCaseNo + " didn't matched with result");
+					test.log(LogStatus.FAIL, "Case Number: " + currentCaseNo + " didn't matched with result");
 				}
 			}
 		}
@@ -287,13 +288,13 @@ public class SampleTest extends UtilBase {
 			driver.navigate().refresh();
 			pageObj.customerNo().sendKeys(currentCustomerNo);
 			pageObj.searchBtn().click();
-			Thread.sleep(3000);
+			Thread.sleep(4000);
 
 			try {
 				driver.findElement(By.xpath("//div[@class='ant-empty ant-empty-normal']"));
-//				above stmt searches for the NO DATA FOUND element, if element is found --> Invalid cutomer no. else, creates an Exception
+//				above stmt searches for the NO DATA FOUND element, if element is found --> Invalid cutomer no. else, creates an Exception and executes the catch block
 				test.log(LogStatus.PASS, "Customer Number: " + currentCustomerNo + " does not Exist");
-				System.out.println("Customer Number:"+currentCustomerNo + " doesnot exists");
+				System.out.println("Customer Number:" + currentCustomerNo + " doesnot exists");
 			} catch (Exception e) {
 //				scroll
 				WebElement element = pageObj.pagination();
@@ -316,7 +317,7 @@ public class SampleTest extends UtilBase {
 					System.out.println("Total no of pages:" + count);
 
 					for (counter = 1; counter <= count; counter++) {
-						storeColumn();
+						storeColumn(2);
 						driver.findElement(By.xpath("//li[@title='Next Page']")).click();
 						Thread.sleep(4000);
 					}
@@ -330,39 +331,51 @@ public class SampleTest extends UtilBase {
 					System.out.println("Total no of pages: " + count);
 
 					for (counter = 1; counter <= count; counter++) {
-						storeColumn();
+						storeColumn(2);
 						driver.findElement(By.xpath("//li[@title='Next Page']")).click();
 						Thread.sleep(4000);
 					}
 
 				}
-				test.log(LogStatus.PASS, "customer no: "+currentCustomerNo+" Total rows of data: " +colData.size());
-				System.out.println("Total rows of data: " + colData.size());
 				
-				/****** comparing code goes here *******************/
+				System.out.println("Total rows of data: " + colData.size());
+
+				/****************** comparing code goes here *******************/
+//				i+1 to get the customer dynamically from the excel file
+				String firstCustomer = ExcelRead.getData((i+1), 0, "customerNo").trim();
+				System.out.println("first customer: " + firstCustomer);
+
+//				counter used to count the total no of error datas
+				int counter = 0;
 				for (int x = 0; x < colData.size(); x++) {
-					if (colData.get(0) != colData.get(x)) {
-						System.out.println("ERROR" +x +"  " + colData.get(x));
+					String dynamicCustomer = colData.get(x);
+					if (firstCustomer.equals(dynamicCustomer)) {
+//						System.out.println("success");
+					} else {
+						System.out.println("ERROR colData index: " + x + " value: " + colData.get(x));
+						counter++;
 					}
 				}
-				
-			
+				System.out.println("Total no of error data: " + counter);
+				test.log(LogStatus.PASS, "customer no: " + currentCustomerNo + " | Total rows of data: " + colData.size() + " | Error data: " +counter);
 			}
 		}
 
 		report.endTest(test);
 	}
 
-	public void storeColumn() throws InterruptedException {
+//	setting parameter int tableCol to specify column index to store the data from
+	public void storeColumn(int tableColIndex) throws InterruptedException {
 //		get table
 		WebElement targetTable = pageObj.table();
 //		get row count
 		int rc = TableData.getRowCount(targetTable);
 		System.out.println("page: " + counter + " data rows: " + (rc - 1));
-		String cellData = null;
 
+		String cellData = null;
 		for (int i = 2; i <= rc; i++) {
-			cellData = driver.findElement(By.xpath("//*[@id='root']/div/div/div/div/div/div/div/div/div/div[2]/table/tbody/tr[" + (i) + "]/td[3]")).getText();
+			cellData = driver.findElement(By.xpath("//*[@id='root']/div/div/div/div/div/div/div/div/div/div[2]/table/tbody/tr[" + (i) + "]/td["+tableColIndex+"]")).getText()
+					.trim();
 			colData.add(cellData);
 		}
 	}
